@@ -64,6 +64,7 @@ $(MAIN): $(OBJS)
 
 clean:
 	$(RM) *.o *~ $(MAIN)
+	rm -f ./src/*.o
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^
