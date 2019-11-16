@@ -1,0 +1,10 @@
+objects = server-ch.o
+
+%.o: %.c
+	gcc -Wall -c -o $@ $<
+	
+server-ch : $(objects)
+	gcc -Wall -o server-ch $(objects)
+
+clean:
+	rm -f *.o
