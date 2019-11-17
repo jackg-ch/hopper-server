@@ -10,7 +10,7 @@
 #include <netdb.h>
 
 #define NUM_PLAYERS 2
-#define IP_ADDRESS "127.0.0.1"
+#define IP_ADDRESS "127.0.0.1" // not currently used
 
 struct player_connection
 {
@@ -89,7 +89,7 @@ int start_game()
     return 0;
 }
 
-void *listen_for_connections(int server_port)
+void *listen_for_connections(char *server_ip, int server_port)
 {
     int server_socket, new_socket;
     struct sockaddr_in serverAddr;
@@ -102,7 +102,7 @@ void *listen_for_connections(int server_port)
     //Set port number using htons to use proper byte order
     serverAddr.sin_port = htons(server_port);
     //Set IP address
-    serverAddr.sin_addr.s_addr = inet_addr(IP_ADDRESS);
+    serverAddr.sin_addr.s_addr = inet_addr(server_ip);
     //Set all bits of the padding field to 0
     memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
     //Bind the address struct to the socket
@@ -127,7 +127,7 @@ void *listen_for_connections(int server_port)
         char hoststr[NI_MAXHOST];
         char portstr[NI_MAXSERV];
 
-        int rc = getnameinfo((struct sockaddr *)&serverStorage, addr_size, hoststr, sizeof(hoststr), portstr, sizeof(portstr), NI_NUMERICHOST | NI_NUMERICSERV);
+        getnameinfo((struct sockaddr *)&serverStorage, addr_size, hoststr, sizeof(hoststr), portstr, sizeof(portstr), NI_NUMERICHOST | NI_NUMERICSERV);
 
         printf("New connection from %s %s\n", hoststr, portstr);
 
@@ -155,16 +155,19 @@ void *listen_for_connections(int server_port)
 
 int main(int argc, char *argv[])
 {
-    int server_port;
-
-    if (argc < 2)
+    if (argc < 3)
     {
-        fprintf(stderr, "ERROR, no port provided\n");
+        fprintf(stderr, "ERROR, no port or ip provided\n");
+		fprintf(stderr, "Usage: executable <ip> <port>\n");
         exit(1);
     }
-    server_port = atoi(argv[1]);
 
-    listen_for_connections(server_port);
+	char *server_ip = argv[1];
+    int server_port;
+
+    server_port = atoi(argv[2]);
+
+    listen_for_connections(server_ip, server_port);
 
     close_connections();
     return 0;
